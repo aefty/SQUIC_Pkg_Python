@@ -16,7 +16,7 @@ def set_path(libSQUIC_path):
 
 	try:
 		dll = CDLL(shared_lib_path)
-		print("libSQUIC Successfully loaded!", dll)
+		print("libSQUIC Successfully loaded!")
 	except Exception as e:
 		print(e)
 

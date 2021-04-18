@@ -34,7 +34,7 @@ if(n>p):
 print("True Inverse Covariance Matrix: \n",iC_star);
 
 # Set the SQUIC Library Path
-SQUIC.set_path('/local_home/aryan/SQUIC_Release_Source/libSQUIC.so')
+SQUIC.set_path('/Users/aryan/gdrive/files/code/SQUIC_Release_Source/darwin20/libSQUIC.dylib')
 
 
 # Scalar SQUIC Paramter Runtime
