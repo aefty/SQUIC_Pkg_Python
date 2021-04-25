@@ -9,8 +9,6 @@ def tridiag(off_diag, diag, p):
 	return np.diag(a,-1) + np.diag(b,0) + np.diag(a,1)
 
 
-
-
 np.set_printoptions(formatter={'float': '{: 0.3f}'.format})
 
 
@@ -34,7 +32,9 @@ if(n>p):
 print("True Inverse Covariance Matrix: \n",iC_star);
 
 # Set the SQUIC Library Path
-SQUIC.set_path('/Users/aryan/gdrive/files/code/SQUIC_Release_Source/darwin20/libSQUIC.dylib')
+#SQUIC.set_path('/Users/aryan/gdrive/files/code/SQUIC_Release_Source/darwin20/libSQUIC.dylib')
+SQUIC.set_path('/local_home/aryan/SQUIC_Release_Source/linux/libSQUIC.so')
+
 
 
 # Scalar SQUIC Paramter Runtime

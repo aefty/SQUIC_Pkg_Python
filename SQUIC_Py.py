@@ -3,6 +3,7 @@ from sys import platform
 import numpy as np
 from scipy.sparse import csr_matrix,isspmatrix_csr, identity
 
+
 shared_lib_path = "/path/to/libSQUIC"
 dll = None
 
@@ -16,29 +17,11 @@ def set_path(libSQUIC_path):
 
 	try:
 		dll = CDLL(shared_lib_path)
-		print("libSQUIC Successfully loaded!")
+		print("libSQUIC Successfully loaded!", dll)
+		return True
 	except Exception as e:
 		print(e)
-
-
-
-
-#	void SQUIC_CPP(
-#		int mode,
-#		integer p,
-#		integer n1, double *Y1,
-#		integer n2, double *Y2,
-#		double lambda,
-#		integer *M_rinx, integer *M_cptr, double *M_val, integer M_nnz,
-#		int max_iter, double drop_tol, double term_tol, int verbose,
-#		integer *&X_rinx, integer *&X_cptr, double *&X_val, integer &X_nnz,
-#		integer *&W_rinx, integer *&W_cptr, double *&W_val, integer &W_nnz,
-#		int &info_num_iter,
-#		double *&info_times,	 //length must be 6: [time_total,time_impcov,time_optimz,time_factor,time_aprinv,time_updte]
-#		double *&info_objective, // length must be size max_iter
-#		double &info_dgap,
-#		double &info_logdetX_Y1,
-#		double &info_trXS_Y2)
+		return False
 
 
 def run(Y_learn,Y_test,l,M,W0,X0,max_iter,term_tol,drop_tol,verbose):	
