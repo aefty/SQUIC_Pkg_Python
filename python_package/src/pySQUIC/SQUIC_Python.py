@@ -1,28 +1,61 @@
 from ctypes import *
-from sys import platform
 import numpy as np
-from scipy.sparse import csr_matrix,isspmatrix_csr, identity
+import os
+from scipy.sparse import csr_matrix, identity  # ,isspmatrix_csr
+from pathlib import Path
+# from sys import platform
 
 #shared_lib_path = "/path/to/libSQUIC"
 #shard_lib_path = "/Users/usi/libSQUIC"
 dll = None
 
 def set_path(libSQUIC_path):
+    global shared_lib_path
+    global dll
 
-	global shared_lib_path 
-	global dll
+    shared_lib_path = libSQUIC_path
 
-	shared_lib_path = libSQUIC_path
+    try:
+        dll = CDLL(shared_lib_path)
+        print("libSQUIC Successfully loaded!", dll)
+        return True
+    except Exception:
+        # print(f"libSQUIC not found under {libSQUIC_path}")
+        return False
 
-	try:
-		dll = CDLL(shared_lib_path)
-		print("libSQUIC Successfully loaded!", dll)
-		return True
-	except Exception as e:
-		print(e)
-		return False
+def check_if_exists(dll):
+    return os.path.exists(dll)
+
+def check_path():
+
+    if dll != None:
+        if check_if_exists(dll._name):
+            print(dll)
+            print("libSQUIC already loaded.")
+            return True
+        else:
+            print(f"libSQUIC not found : {dll}")
+            return False
+    else:
+        home_dir = str(Path.home())
+        file_name_dylib = "/libSQUIC.dylib"
+        file_name_so = "/libSQUIC.so"
+
+        if set_path(home_dir + file_name_dylib) or set_path(home_dir + file_name_so):
+
+            return True
+        else:
+            print("libSQUIC path not set correctly. Add path by calling: set_path(libSQUIC_path)")
+            return False
+
+def get_path():
+	print("current libSQUIC path:")
+	print(dll)
 
 def SQUIC(Y, l, max_iter=100, drop_tol=1e-3, term_tol=1e-3,verbose=1, M=None, X0=None, W0=None):
+
+	if not check_path():
+		return
 
 	# if mode = [0,1,2,3,4] we Block-SQUIC or [5,6,7,8,9] Scalar-SQUIC
 	mode = c_int(0)
