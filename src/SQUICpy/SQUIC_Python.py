@@ -52,7 +52,25 @@ def get_path():
 	print("current libSQUIC path:")
 	print(dll)
 
-def SQUIC(Y, l, max_iter=100, drop_tol=1e-3, term_tol=1e-3,verbose=1, M=None, X0=None, W0=None):
+def SQUIC(Y, l, max_iter=100, inv_tol=1e-3, term_tol=1e-3,verbose=1, M=None, X0=None, W0=None):
+	"""
+	:param Y: Data matrix p x p consisting of p>2 random variables and n>1 samples.
+	:param l: Sparsity parameter as a nonzero positive scalar.
+	:param max_iter: [default 100] Maximum number of Newton iterations as a nonnegative integer
+	:param inv_tol: [default 1e-3] Termination tolerance as a nonzero positive scalar.
+	:param term_tol: [default 1e-3] Dropout tolerance as a nonzero positive scalar.
+	:param verbose: [default 1] Verbosity level as 0 or 1.
+	:param M: [default None] Sparsity structure matrix as a sparse p x p matrix.
+	:param X0: [default None] Initial value of precision matrix as a sparse p x p matrix.
+	:param W0: [default None] Initial value of inverse precision matrix as a sparse p x p  matrix.
+	:return: [X,W,info_times,info_objective,info_logdetX,info_trSX]
+		:return: X: Precision matrix as a sparse p x p matrix.
+		:return: W: Inverse precision matrix as a sparse p x p matrix.
+		:return: info_times: List of different compute times.
+		:return: info_objective: List of objective function values at each Newton iteration.
+		:return: info_logdetX: Log-determinant of the final precision matrix.
+		:return: info_trSX: Trace of sample covariance matrix times the final precision matrix.
+	"""
 
 	if not check_path():
 		return
@@ -118,7 +136,7 @@ def SQUIC(Y, l, max_iter=100, drop_tol=1e-3, term_tol=1e-3,verbose=1, M=None, X0
 	#################################################
 	max_iter_ptr  = c_int(max_iter);
 	term_tol_ptr  = c_double(term_tol);
-	drop_tol_ptr  = c_double(drop_tol);
+	inv_tol_ptr  = c_double(inv_tol);
 	verbose_ptr   = c_int(verbose)
 
 	p_ptr    = c_long(p)
@@ -145,7 +163,7 @@ def SQUIC(Y, l, max_iter=100, drop_tol=1e-3, term_tol=1e-3,verbose=1, M=None, X0
 		p_ptr, n_ptr, Y_ptr,
 		l_ptr, 
 		M_rinx, M_cptr, M_val, M_nnz,
-		max_iter_ptr, drop_tol_ptr, term_tol_ptr, verbose_ptr,
+		max_iter_ptr, inv_tol_ptr, term_tol_ptr, verbose_ptr,
 		byref(X_rinx), byref(X_cptr), byref(X_val), byref(X_nnz),
 		byref(W_rinx), byref(W_cptr), byref(W_val), byref(W_nnz),
 		byref(info_num_iter_ptr),
@@ -208,6 +226,15 @@ def SQUIC(Y, l, max_iter=100, drop_tol=1e-3, term_tol=1e-3,verbose=1, M=None, X0
 	return [X,W,info_times,info_objective,info_logdetX,info_trSX]
 
 def SQUIC_S(Y, l,verbose=1, M=None):
+	"""
+	:param Y:
+	:param l:
+	:param verbose:
+	:param M:
+	:return: [S, info_times]
+		:return: S: sparse(thresholded) sample covariance matrix.
+		:return: info_times: List of different compute times.
+	"""
 
 	[_,S,info_times,_,_,_]=SQUIC(Y=Y, l=l, max_iter=0, verbose=verbose, M=M)
 

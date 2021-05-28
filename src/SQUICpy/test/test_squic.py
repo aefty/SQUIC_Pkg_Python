@@ -3,7 +3,7 @@
 import numpy as np
 from scipy.sparse import csr_matrix #,isspmatrix_csr, identity
 
-import pySQUIC as pyS
+import SQUICpy as sp
 
 # QUICK FIX OMP ERROR, remove later
 import os
@@ -33,9 +33,6 @@ def generate_sample(p, n):
 def run_SQUIC_S(p = 20, n = 10, verbose=True):
 	np.set_printoptions(formatter={'float': '{: 0.3f}'.format})
 
-	# check libSQUIC path
-	pyS.check_path()
-
 	np.random.seed(1)
 	iC_star = tridiag(-0.5, 1.25, p)
 	L = np.linalg.cholesky(iC_star)
@@ -52,7 +49,7 @@ def run_SQUIC_S(p = 20, n = 10, verbose=True):
 
 	l=.5
 
-	[S,info_times]=pyS.SQUIC_S(Y=Y,l=l)
+	[S,info_times]=sp.SQUIC_S(Y=Y,l=l)
 
 	if(verbose == True):
 		print("Sample Covariance Matrix \n", S.todense())
@@ -65,9 +62,6 @@ def run_SQUIC_S(p = 20, n = 10, verbose=True):
 
 def run_SQUIC(p=20,n=10, verbose=True):
 	np.set_printoptions(formatter={'float': '{: 0.3f}'.format})
-
-	# check libSQUIC path
-	pyS.check_path()
 
 	np.random.seed(1)
 	iC_star = tridiag(-0.5,1.25,p)
@@ -91,7 +85,7 @@ def run_SQUIC(p=20,n=10, verbose=True):
 	# Scalar SQUIC Paramter Runtime
 	l=.25
 
-	[X,W,info_times,info_objective,info_logdetX,info_trSX]=pyS.SQUIC(Y=Y,l=l)
+	[X,W,info_times,info_objective,info_logdetX,info_trSX]=sp.SQUIC(Y=Y,l=l)
 
 	if(verbose == True):
 		print("Inverse Covariance Matrix \n", X.todense())
@@ -106,9 +100,6 @@ def run_SQUIC(p=20,n=10, verbose=True):
 
 def run_SQUIC_M(p=20, n=10, verbose=True):
 	np.set_printoptions(formatter={'float': '{: 0.3f}'.format})
-
-	# check libSQUIC path
-	pyS.check_path()
 
 	np.random.seed(1)
 	iC_star = tridiag(-0.5,1.25,p)
@@ -150,7 +141,7 @@ def run_SQUIC_M(p=20, n=10, verbose=True):
 
 	l=.5
 
-	[X,W,info_times,info_objective,info_logdetX,info_trSX]=pyS.SQUIC(Y=Y,l=l,M=M)
+	[X,W,info_times,info_objective,info_logdetX,info_trSX]=sp.SQUIC(Y=Y,l=l,M=M)
 
 	if(verbose == True):
 		print("Inverse Covariance Matrix \n", X.todense())
