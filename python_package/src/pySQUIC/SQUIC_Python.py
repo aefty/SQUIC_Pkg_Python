@@ -1,30 +1,61 @@
 from ctypes import *
-from sys import platform
 import numpy as np
-from scipy.sparse import csr_matrix,isspmatrix_csr, identity
+import os
+from scipy.sparse import csr_matrix, identity  # ,isspmatrix_csr
+from pathlib import Path
+# from sys import platform
 
 #shared_lib_path = "/path/to/libSQUIC"
 #shard_lib_path = "/Users/usi/libSQUIC"
 dll = None
 
 def set_path(libSQUIC_path):
+    global shared_lib_path
+    global dll
 
-	global shared_lib_path 
-	global dll
+    shared_lib_path = libSQUIC_path
 
-	shared_lib_path = libSQUIC_path
+    try:
+        dll = CDLL(shared_lib_path)
+        print("libSQUIC Successfully loaded!", dll)
+        return True
+    except Exception:
+        # print(f"libSQUIC not found under {libSQUIC_path}")
+        return False
 
-	try:
-		dll = CDLL(shared_lib_path)
-		print("libSQUIC Successfully loaded!", dll)
-		return True
-	except Exception as e:
-		print(e)
-		return False
+def check_if_exists(dll):
+    return os.path.exists(dll)
 
+def check_path():
 
-def SQUIC(Y, l, max_iter=100, inv_tol=1e-3, term_tol=1e-3,verbose=1, M=None, X0=None, W0=None):	
+    if dll != None:
+        if check_if_exists(dll._name):
+            print(dll)
+            print("libSQUIC already loaded.")
+            return True
+        else:
+            print(f"libSQUIC not found : {dll}")
+            return False
+    else:
+        home_dir = str(Path.home())
+        file_name_dylib = "/libSQUIC.dylib"
+        file_name_so = "/libSQUIC.so"
 
+        if set_path(home_dir + file_name_dylib) or set_path(home_dir + file_name_so):
+
+            return True
+        else:
+            print("libSQUIC path not set correctly. Add path by calling: set_path(libSQUIC_path)")
+            return False
+
+def get_path():
+	print("current libSQUIC path:")
+	print(dll)
+
+def SQUIC(Y, l, max_iter=100, drop_tol=1e-3, term_tol=1e-3,verbose=1, M=None, X0=None, W0=None):
+
+	if not check_path():
+		return
 
 	# if mode = [0,1,2,3,4] we Block-SQUIC or [5,6,7,8,9] Scalar-SQUIC
 	mode = c_int(0)
@@ -87,7 +118,7 @@ def SQUIC(Y, l, max_iter=100, inv_tol=1e-3, term_tol=1e-3,verbose=1, M=None, X0=
 	#################################################
 	max_iter_ptr  = c_int(max_iter);
 	term_tol_ptr  = c_double(term_tol);
-	inv_tol_ptr  = c_double(inv_tol);
+	drop_tol_ptr  = c_double(drop_tol);
 	verbose_ptr   = c_int(verbose)
 
 	p_ptr    = c_long(p)
@@ -114,7 +145,7 @@ def SQUIC(Y, l, max_iter=100, inv_tol=1e-3, term_tol=1e-3,verbose=1, M=None, X0=
 		p_ptr, n_ptr, Y_ptr,
 		l_ptr, 
 		M_rinx, M_cptr, M_val, M_nnz,
-		max_iter_ptr, inv_tol_ptr, term_tol_ptr, verbose_ptr,
+		max_iter_ptr, drop_tol_ptr, term_tol_ptr, verbose_ptr,
 		byref(X_rinx), byref(X_cptr), byref(X_val), byref(X_nnz),
 		byref(W_rinx), byref(W_cptr), byref(W_val), byref(W_nnz),
 		byref(info_num_iter_ptr),

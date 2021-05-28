@@ -2,11 +2,18 @@ import SQUIC_Python as SQUIC_P
 import numpy as np
 from scipy.sparse import csr_matrix,isspmatrix_csr, identity
 
+# QUICK FIX OMP ERROR, remove later
+#import os
+#os.environ['KMP_DUPLICATE_LIB_OK']='True'
+
+
 
 def tridiag(off_diag, diag, p):
 	a=np.ones(p-1)*off_diag
 	b=np.ones(p)*diag
 	return np.diag(a,-1) + np.diag(b,0) + np.diag(a,1)
+
+
 np.set_printoptions(formatter={'float': '{: 0.3f}'.format})
 
 p=200
@@ -27,7 +34,8 @@ if(n>p):
 print("True Inverse Covariance Matrix: \n",iC_star);
 
 # Set the SQUIC Library Path
-SQUIC_P.set_path('/Users/aryan/gdrive/files/code/SQUIC_Release_Source/darwin20/libSQUIC.dylib')
+SQUIC_P.set_path('/Users/usi/libSQUIC.dylib')
+#SQUIC_P.set_path('/Users/aryan/gdrive/files/code/SQUIC_Release_Source/darwin20/libSQUIC.dylib')
 #SQUIC.set_path('/local_home/aryan/SQUIC_Release_Source/linux/libSQUIC.so')
 
 # Scalar SQUIC Paramter Runtime
@@ -62,7 +70,6 @@ M = M* 1e-6;
 
 l=.5
 
-
 [X,W,info_times,info_objective,info_logdetX,info_trSX]=SQUIC_P.SQUIC(Y=Y,l=l,M=M)
 #print("Inverse Covariance Matrix \n", X.todense())
 #print("Covariance Matrix \n", W.todense())
@@ -70,6 +77,7 @@ print("Objective Function Trace\n", info_objective)
 print("Time List [time_total,time_impcov,time_optimz,time_factor,time_aprinv,time_updte] \n", info_times)
 print("info_logdetX \n", info_logdetX)
 print("info_trSX \n", info_trSX)
+
 
 [S,info_times]=SQUIC_P.SQUIC_S(Y=Y,l=l)
 #print("Sample Covariance Matrix \n", S.todense())

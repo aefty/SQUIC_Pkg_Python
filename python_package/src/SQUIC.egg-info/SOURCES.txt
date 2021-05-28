@@ -1,0 +1,12 @@
+README.md
+pyproject.toml
+setup.cfg
+setup.py
+src/SQUIC/SQUIC_Python.py
+src/SQUIC/__init__.py
+src/SQUIC.egg-info/PKG-INFO
+src/SQUIC.egg-info/SOURCES.txt
+src/SQUIC.egg-info/dependency_links.txt
+src/SQUIC.egg-info/top_level.txt
+src/SQUIC/test/__init__.py
+src/SQUIC/test/test_squic.py
