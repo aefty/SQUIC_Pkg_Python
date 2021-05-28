@@ -21,7 +21,7 @@ def set_path(libSQUIC_path):
 		print(e)
 		return False
 
-def SQUIC(Y, l, max_iter=100, drop_tol=1e-3, term_tol=1e-3,verbose=1, M=None, X0=None, W0=None):	
+def SQUIC(Y, l, max_iter=100, inv_tol=1e-3, term_tol=1e-3,verbose=1, M=None, X0=None, W0=None):	
 
 	# if mode = [0,1,2,3,4] we Block-SQUIC or [5,6,7,8,9] Scalar-SQUIC
 	mode = c_int(0)
@@ -84,7 +84,7 @@ def SQUIC(Y, l, max_iter=100, drop_tol=1e-3, term_tol=1e-3,verbose=1, M=None, X0
 	#################################################
 	max_iter_ptr  = c_int(max_iter);
 	term_tol_ptr  = c_double(term_tol);
-	drop_tol_ptr  = c_double(drop_tol);
+	inv_tol_ptr  = c_double(inv_tol);
 	verbose_ptr   = c_int(verbose)
 
 	p_ptr    = c_long(p)
@@ -111,7 +111,7 @@ def SQUIC(Y, l, max_iter=100, drop_tol=1e-3, term_tol=1e-3,verbose=1, M=None, X0
 		p_ptr, n_ptr, Y_ptr,
 		l_ptr, 
 		M_rinx, M_cptr, M_val, M_nnz,
-		max_iter_ptr, drop_tol_ptr, term_tol_ptr, verbose_ptr,
+		max_iter_ptr, inv_tol_ptr, term_tol_ptr, verbose_ptr,
 		byref(X_rinx), byref(X_cptr), byref(X_val), byref(X_nnz),
 		byref(W_rinx), byref(W_cptr), byref(W_val), byref(W_nnz),
 		byref(info_num_iter_ptr),

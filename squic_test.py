@@ -9,7 +9,7 @@ def tridiag(off_diag, diag, p):
 	return np.diag(a,-1) + np.diag(b,0) + np.diag(a,1)
 np.set_printoptions(formatter={'float': '{: 0.3f}'.format})
 
-p=20
+p=200
 n=10
 
 np.random.seed(1)
@@ -21,7 +21,7 @@ S=np.cov(Y,bias=1)
 
 
 print("There is n=%d samples and p=%d variables"% (n,p));
-print("Sample Covariance Matrix (dont need this just for info): \n",S);
+#print("Sample Covariance Matrix (dont need this just for info): \n",S);
 if(n>p):
 	print("Inverse of Sample Covariance Matrix (dont need this just for info): \n",np.linalg.inv(S));
 print("True Inverse Covariance Matrix: \n",iC_star);
@@ -34,8 +34,8 @@ SQUIC_P.set_path('/Users/aryan/gdrive/files/code/SQUIC_Release_Source/darwin20/l
 l=.25
 
 [X,W,info_times,info_objective,info_logdetX,info_trSX]=SQUIC_P.SQUIC(Y=Y,l=l)
-print("Inverse Covariance Matrix \n", X.todense())
-print("Covariance Matrix \n", W.todense())
+#print("Inverse Covariance Matrix \n", X.todense())
+#print("Covariance Matrix \n", W.todense())
 print("Objective Function Trace\n", info_objective)
 print("Time List [time_total,time_impcov,time_optimz,time_factor,time_aprinv,time_updte] \n", info_times)
 print("info_logdetX \n", info_logdetX)
@@ -64,15 +64,15 @@ l=.5
 
 
 [X,W,info_times,info_objective,info_logdetX,info_trSX]=SQUIC_P.SQUIC(Y=Y,l=l,M=M)
-print("Inverse Covariance Matrix \n", X.todense())
-print("Covariance Matrix \n", W.todense())
+#print("Inverse Covariance Matrix \n", X.todense())
+#print("Covariance Matrix \n", W.todense())
 print("Objective Function Trace\n", info_objective)
 print("Time List [time_total,time_impcov,time_optimz,time_factor,time_aprinv,time_updte] \n", info_times)
 print("info_logdetX \n", info_logdetX)
 print("info_trSX \n", info_trSX)
 
 [S,info_times]=SQUIC_P.SQUIC_S(Y=Y,l=l)
-print("Sample Covariance Matrix \n", S.todense())
+#print("Sample Covariance Matrix \n", S.todense())
 print("Time List [time_total,time_impcov,time_optimz,time_factor,time_aprinv,time_updte] \n", info_times)
 
 
