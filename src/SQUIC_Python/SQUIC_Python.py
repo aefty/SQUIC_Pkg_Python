@@ -1,30 +1,80 @@
 from ctypes import *
-from sys import platform
 import numpy as np
-from scipy.sparse import csr_matrix,isspmatrix_csr, identity
+#import os
+from scipy.sparse import csr_matrix, identity
+from pathlib import Path
 
-#shared_lib_path = "/path/to/libSQUIC"
-#shard_lib_path = "/Users/usi/libSQUIC"
+# QUICK FIX OMP ERROR
+import os
+os.environ['KMP_DUPLICATE_LIB_OK']='True'
+
 dll = None
 
 def set_path(libSQUIC_path):
 
-	global shared_lib_path 
-	global dll
+    global shared_lib_path
+    global dll
 
-	shared_lib_path = libSQUIC_path
+    shared_lib_path = libSQUIC_path
 
-	try:
-		dll = CDLL(shared_lib_path)
-		print("libSQUIC Successfully loaded!", dll)
-		return True
-	except Exception as e:
-		print(e)
-		return False
+    try:
+        dll = CDLL(shared_lib_path)
+        print("libSQUIC Successfully loaded!", dll)
+        return True
+    except Exception:
+        return False
 
+def check_if_exists(dll):
+    return os.path.exists(dll)
 
-def SQUIC(Y, l, max_iter=100, inv_tol=1e-3, term_tol=1e-3,verbose=1, M=None, X0=None, W0=None):	
+def check_path():
 
+    if dll != None:
+        if check_if_exists(dll._name):
+            print(dll)
+            print("libSQUIC already loaded.")
+            return True
+        else:
+            print(f"libSQUIC not found : {dll}")
+            return False
+    else:
+        home_dir = str(Path.home())
+        file_name_dylib = "/libSQUIC.dylib"
+        file_name_so = "/libSQUIC.so"
+
+        if set_path(home_dir + file_name_dylib) or set_path(home_dir + file_name_so):
+
+            return True
+        else:
+            print("libSQUIC path not set correctly or library not yet downloaded. Add path by calling: set_path(libSQUIC_path).")
+            return False
+
+def get_path():
+	print("current libSQUIC path:")
+	print(dll)
+
+def SQUIC(Y, l, max_iter=100, inv_tol=1e-3, term_tol=1e-3,verbose=1, M=None, X0=None, W0=None):
+	"""
+	:param Y: Data matrix p x p consisting of p>2 random variables and n>1 samples.
+	:param l: Sparsity parameter as a nonzero positive scalar.
+	:param max_iter: [default 100] Maximum number of Newton iterations as a nonnegative integer
+	:param inv_tol: [default 1e-3] Termination tolerance as a nonzero positive scalar.
+	:param term_tol: [default 1e-3] Dropout tolerance as a nonzero positive scalar.
+	:param verbose: [default 1] Verbosity level as 0 or 1.
+	:param M: [default None] Sparsity structure matrix as a sparse p x p matrix.
+	:param X0: [default None] Initial value of precision matrix as a sparse p x p matrix.
+	:param W0: [default None] Initial value of inverse precision matrix as a sparse p x p  matrix.
+	:return: [X,W,info_times,info_objective,info_logdetX,info_trSX]
+		:return: X: Precision matrix as a sparse p x p matrix.
+		:return: W: Inverse precision matrix as a sparse p x p matrix.
+		:return: info_times: List of different compute times.
+		:return: info_objective: List of objective function values at each Newton iteration.
+		:return: info_logdetX: Log-determinant of the final precision matrix.
+		:return: info_trSX: Trace of sample covariance matrix times the final precision matrix.
+	"""
+
+	if not check_path():
+		return
 
 	# if mode = [0,1,2,3,4] we Block-SQUIC or [5,6,7,8,9] Scalar-SQUIC
 	mode = c_int(0)
@@ -177,6 +227,15 @@ def SQUIC(Y, l, max_iter=100, inv_tol=1e-3, term_tol=1e-3,verbose=1, M=None, X0=
 	return [X,W,info_times,info_objective,info_logdetX,info_trSX]
 
 def SQUIC_S(Y, l,verbose=1, M=None):
+	"""
+	:param Y:
+	:param l:
+	:param verbose:
+	:param M:
+	:return: [S, info_times]
+		:return: S: sparse(thresholded) sample covariance matrix.
+		:return: info_times: List of different compute times.
+	"""
 
 	[_,S,info_times,_,_,_]=SQUIC(Y=Y, l=l, max_iter=0, verbose=verbose, M=M)
 

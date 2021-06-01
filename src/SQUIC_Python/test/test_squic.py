@@ -1,7 +1,5 @@
-#from SQUIC import SQUIC, SQUIC_S, set_path
-
 import numpy as np
-from scipy.sparse import csr_matrix #,isspmatrix_csr, identity
+from scipy.sparse import csr_matrix
 
 import SQUICpy as sp
 
