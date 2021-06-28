@@ -1,33 +1,82 @@
 import numpy as np
-from scipy.sparse import csr_matrix
+from scipy.sparse import csr_matrix, spdiags
+from scipy.linalg import cholesky
 
-import SQUICpy as sp
+import SQUIC_Python as sp
 
 # QUICK FIX OMP ERROR, remove later
 import os
 os.environ['KMP_DUPLICATE_LIB_OK']='True'
 
+def sparse_tridiag(off_diag, diag, p):
+	a = np.ones(p - 1) * off_diag
+	b = np.ones(p) * diag
+	return spdiags(a, -1,p,p) + spdiags(b, 0,p,p) + spdiags(a, 1,p,p)
+
+Q = sparse_tridiag(-0.5, 1.25, 10)
+print(Q)
+
 
 def tridiag(off_diag, diag, p):
+	"""
+	generate symmetric tridiagonal matrix using numpy
+	:param off_diag: [double] upper and lower off-diagonal values
+	:param diag: [double] diagonal value.
+	:param p: [integer] dimension of the matrix
+	:return: symmetric tridiagonal matrix
+	"""
 	a=np.ones(p-1)*off_diag
 	b=np.ones(p)*diag
 	return np.diag(a,-1) + np.diag(b,0) + np.diag(a,1)
 
 
-def generate_sample(p, n):
-    # create tridiagonal sparse inverse covariance matrix with entries: -0.5, 1.25,-0.5
-    invSigma = np.eye(p,p,k=-1)*(-0.5) + np.eye(p)*1.25 + np.eye(p,p,k=1)*(-0.5)
+def sparse_generate_sample(p=1000, n=100):
+	"""
+	generate sample matrix Y of dimension p x n.
+	:param p: [integer] number of covariates, optional value, default p = 1000.
+	:param n: [integer] numper of samples, optional value, default n = 100.
+	:return: Y
+	"""
+	# create tridiagonal inverse covariance matrix with entries: -0.5, 1.25,-0.5
+	# chosen such that iC_star will be symmetric positive definite
+	np.random.seed(1)
+	iC_star = sparse_tridiag(-0.5,1.25,p)
+	iC_star_dense = iC_star.todense()
+	print(iC_star_dense)
 
-    # invert
-    Sigma = np.linalg.inv(invSigma)
-    mean = [0]*p
+	# compute Cholesky factor L
+	L = cholesky(iC_star_dense)
 
-    # sample from this distribution
-    Y = np.transpose(np.random.multivariate_normal(mean, Sigma, n))
+	# sample from standard normal distribution & solve
+	Y = np.linalg.solve(L.T,np.random.randn(p,n))
 
-    return Y
+	return Y
 
+Y = sparse_generate_sample(p=10, n = 100)
 
+def generate_sample(p=1000, n=100):
+	"""
+	generate sample matrix Y of dimension p x n.
+	:param p: [integer] number of covariates, optional value, default p = 1000.
+	:param n: [integer] numper of samples, optional value, default n = 100.
+	:return: Y
+	"""
+	# create tridiagonal inverse covariance matrix with entries: -0.5, 1.25,-0.5
+	# chosen such that iC_star will be symmetric positive definite
+	np.random.seed(1)
+	iC_star = tridiag(-0.5,1.25,p)
+
+	# compute Cholesky factor L
+	L = np.linalg.cholesky(iC_star)
+
+	# sample from standard normal distribution & solve
+	Y = np.linalg.solve(L.T,np.random.randn(p,n))
+
+	return Y
+
+# call SQUIC_S
+
+# 1000, 10
 def run_SQUIC_S(p = 20, n = 10, verbose=True):
 	np.set_printoptions(formatter={'float': '{: 0.3f}'.format})
 
@@ -74,11 +123,6 @@ def run_SQUIC(p=20,n=10, verbose=True):
 		if(n>p):
 			print("Inverse of Sample Covariance Matrix (dont need this just for info): \n",np.linalg.inv(S));
 		print("True Inverse Covariance Matrix: \n",iC_star);
-
-	# Set the SQUIC Library Path
-	#SQUIC.set_path('/Users/usi/libSQUIC.dylib')
-	#SQUIC_P.set_path('/Users/aryan/gdrive/files/code/SQUIC_Release_Source/darwin20/libSQUIC.dylib')
-	#SQUIC.set_path('/local_home/aryan/SQUIC_Release_Source/linux/libSQUIC.so')
 
 	# Scalar SQUIC Paramter Runtime
 	l=.25
