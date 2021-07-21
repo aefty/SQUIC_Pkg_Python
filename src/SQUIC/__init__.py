@@ -1,9 +1,6 @@
 """
-SQUIC_Python :
-====
-Package for Sparse Quadratic Inverse Covariance Estimation.
-
-## SQUIC for Python
+SQUIC for Python
+=========
 ### Sparse Quadratic Inverse Covariance Estimation
 This is the SQUIC algorithm, made available as a Python package.
 SQUIC tackles the statistical problem of estimating large sparse
@@ -25,30 +22,60 @@ For further details please see the listed references.
 
 ### Installation
 
-Before using SQUIC_Python for the first time, the pre-compiled library
-libSQUIC needs to be installed from https://github.com/aefty/SQUIC_Release_Source.
+We are currently supporting Linux and MacOS distributions.
 
-The libSQUIC(.dylib/.so) file will by default be installed in your home directory.
-This way the SQUIC_Python package will find it automatically. Otherwise you can manually
+Before installing the SQUIC for Python package, the pre-compiled library
+libSQUIC(.dylib/.so) needs to be installed from https://www.gitlab.ci.inf.usi.ch/SQUIC/libSQUIC. Please follow the instructions provided there.
+
+Now you can install the SQUIC for Python package from PyPI using
+
+```angular2
+pip install SQUIC
+```
+
+The libSQUIC(.dylib/.so) file is by default be installed in your home directory.
+This way the SQUIC package for Python will find it automatically. Otherwise you can manually
 set the path using
 
 ```angular2
-import SQUIC_Python as SQ
-SQ.set_path("/path/to/libSQUIC(.dylib/.so)")
+import SQUIC
+SQUIC.set_path("/path/to/libSQUIC(.dylib/.so)")
 ```
 
-We are currently supporting Linux and MacOS distributions.
-
-### Example
+### Example I
 
 ```angular2
-import SQUIC_Python as SQ
+import SQUIC
+import numpy as np
+
+# number of covariates p, number of samples n
+p=1024
+n=100
+
+# set regularisation parameter lambda
+l=0.4
+
+# sample synthetic data from standard normal distribution
+Y=np.random.randn(p,n)
+
+# compute sparse precision matrix and its inverse
+[X,W,info_times,info_objective,info_logdetX,info_trSX]= SQUIC.run(Y=Y,l=l)
+```
+
+### Example II
+
+```angular2
+# set OMP_NUM_THREADS before loading SQUIC
+import os
+os.environ["OMP_NUM_THREADS"] = '4'
+
+# load SQUIC and numpy
+import SQUIC
 import numpy as np
 
 # generate sample from tridiagonal precision matrix
-
 # number of covariates p
-p = 1000
+p = 1024
 # number of samples n
 n = 100
 
@@ -68,10 +95,10 @@ Y = np.linalg.solve(L.T,np.random.randn(p,n))
 # set regularisation parameter lambda
 l = 0.3
 # compute sample covariance matrix
-[S,info_times] = SQ.SQUIC_S(Y, l)
+[S,info_times] = SQUIC.S_run(Y, l)
 
 # compute sparse precision matrix and its inverse
-[X,W,info_times,info_objective,info_logdetX,info_trSX] = SQ.SQUIC(Y,l)
+[X,W,info_times,info_objective,info_logdetX,info_trSX] = SQUIC.run(Y,l)
 
 # X contains estimate for iC_star
 # W contains inverse of X
@@ -80,8 +107,8 @@ l = 0.3
 For a detailed list of all (optional) input and output parameters:
 
 ```angular2
-help(SQ.SQUIC_S)
-help(SQ.SQUIC)
+help(SQUIC.S_run)
+help(SQUIC.run)
 ```
 
 """
@@ -90,6 +117,6 @@ from .SQUIC_Python import set_path
 from .SQUIC_Python import get_path
 from .SQUIC_Python import check_path
 
-from .SQUIC_Python import SQUIC
-from .SQUIC_Python import SQUIC_S
+from .SQUIC_Python import run
+from .SQUIC_Python import S_run
 

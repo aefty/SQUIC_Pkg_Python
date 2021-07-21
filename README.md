@@ -36,14 +36,14 @@ This way the SQUIC package for Python will find it automatically. Otherwise you 
 set the path using
 
 ```angular2
-import SQUIC as SQ
-SQ.set_path("/path/to/libSQUIC(.dylib/.so)")
+import SQUIC
+SQUIC.set_path("/path/to/libSQUIC(.dylib/.so)")
 ```
 
 ### Example I 
 
 ```angular2
-import SQUIC as SQ
+import SQUIC 
 import numpy as np
 
 # number of covariates p, number of samples n
@@ -57,7 +57,7 @@ l=0.4
 Y=np.random.randn(p,n)
 
 # compute sparse precision matrix and its inverse
-[X,W,info_times,info_objective,info_logdetX,info_trSX]= SQ.SQUIC(Y=Y,l=l)
+[X,W,info_times,info_objective,info_logdetX,info_trSX]= SQUIC.run(Y=Y,l=l)
 ```
 
 ### Example II
@@ -68,7 +68,7 @@ import os
 os.environ["OMP_NUM_THREADS"] = '4'
 
 # load SQUIC and numpy
-import SQUIC as SQ
+import SQUIC 
 import numpy as np
 
 # generate sample from tridiagonal precision matrix
@@ -93,10 +93,10 @@ Y = np.linalg.solve(L.T,np.random.randn(p,n))
 # set regularisation parameter lambda
 l = 0.3
 # compute sample covariance matrix
-[S,info_times] = SQ.SQUIC_S(Y, l)
+[S,info_times] = SQUIC.S_run(Y, l)
 
 # compute sparse precision matrix and its inverse
-[X,W,info_times,info_objective,info_logdetX,info_trSX] = SQ.SQUIC(Y,l)
+[X,W,info_times,info_objective,info_logdetX,info_trSX] = SQUIC.run(Y,l)
 
 # X contains estimate for iC_star
 # W contains inverse of X
@@ -105,6 +105,6 @@ l = 0.3
 For a detailed list of all (optional) input and output parameters: 
 
 ```angular2
-help(SQ.SQUIC_S)
-help(SQ.SQUIC)
+help(SQUIC.S_run)
+help(SQUIC.run)
 ```

@@ -52,7 +52,7 @@ def get_path():
 	print("current libSQUIC path:")
 	print(dll)
 
-def SQUIC(Y, l, max_iter=100, inv_tol=1e-3, term_tol=1e-3,verbose=1, M=None, X0=None, W0=None):
+def run(Y, l, max_iter=100, inv_tol=1e-3, term_tol=1e-3,verbose=1, M=None, X0=None, W0=None):
 	"""
 	Sparse Inverse Covariance Estimation
 	:param Y: Data matrix p x p consisting of p>2 random variables and n>1 samples.
@@ -226,7 +226,7 @@ def SQUIC(Y, l, max_iter=100, inv_tol=1e-3, term_tol=1e-3,verbose=1, M=None, X0=
 
 	return [X,W,info_times,info_objective,info_logdetX,info_trSX]
 
-def SQUIC_S(Y, l,verbose=1, M=None):
+def S_run(Y, l,verbose=1, M=None):
 	"""
 	:param Y:
 	:param l:
@@ -237,7 +237,7 @@ def SQUIC_S(Y, l,verbose=1, M=None):
 		:return: info_times: List of different compute times.
 	"""
 
-	[_,S,info_times,_,_,_]=SQUIC(Y=Y, l=l, max_iter=0, verbose=verbose, M=M)
+	[_,S,info_times,_,_,_]=run(Y=Y, l=l, max_iter=0, verbose=verbose, M=M)
 
 	return [S,info_times]
 
