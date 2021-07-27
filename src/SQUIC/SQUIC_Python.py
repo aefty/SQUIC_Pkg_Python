@@ -1,5 +1,6 @@
 from ctypes import *
 import numpy as np
+import os
 from scipy.sparse import csr_matrix, identity
 from pathlib import Path
 
@@ -17,30 +18,8 @@ def set_path(libSQUIC_path):
         print("libSQUIC Successfully loaded!", dll)
         return True
     except Exception:
-        print("libSQUIC could not be found under the current path.")
+        print("libSQUIC could not be found under the current path: ", libSQUIC_path)
         return False
-
-def check_path():
-
-    if dll != None:
-        if os.path.exists(dll._name):
-            print(dll)
-            print("libSQUIC already loaded.")
-            return True
-        else:
-            print(f"libSQUIC not found : {dll}")
-            return False
-    else:
-        home_dir = str(Path.home())
-        file_name_dylib = "/libSQUIC.dylib"
-        file_name_so = "/libSQUIC.so"
-
-        if set_path(home_dir + file_name_dylib) or set_path(home_dir + file_name_so):
-
-            return True
-        else:
-            print("libSQUIC path not set correctly or library not yet downloaded. Add path by calling: SQUIC.set_path(libSQUIC_path).")
-            return False
 
 
 def run(Y, l, max_iter=100, tol=1e-3,verbose=1, M=None, X0=None, W0=None):
@@ -69,9 +48,31 @@ def run(Y, l, max_iter=100, tol=1e-3,verbose=1, M=None, X0=None, W0=None):
         :return: info_trSX: Value of the trace of the sample covariance matrix times the precision matrix.
     """
 
-    if not check_path():
-        return
+    # check if libSQUIC path set & library exists
+    if dll != None:
+        if os.path.exists(dll._name):
+            print(dll)
+            print("libSQUIC already loaded.")
 
+        else:
+            print(f"libSQUIC not found : {dll}")
+            return False
+
+    # if libSQUIC path not set, check if libSQUIC is in home directory
+    else:
+        home_dir = str(Path.home())
+        file_name_dylib = "/libSQUIC.dylib"
+        file_name_so = "/libSQUIC.so"
+
+        if set_path(home_dir + file_name_dylib) or set_path(home_dir + file_name_so):
+            pass
+
+        else:
+            print(
+                "libSQUIC path not set correctly or library not yet downloaded. Add path by calling: SQUIC.set_path(libSQUIC_path).")
+            return False
+
+    #################################################
     # if mode = [0,1,2,3,4] we Block-SQUIC or [5,6,7,8,9] Scalar-SQUIC
     mode = c_int(0)
 

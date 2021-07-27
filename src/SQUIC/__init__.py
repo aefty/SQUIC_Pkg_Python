@@ -82,7 +82,6 @@ Y = np.linalg.solve(L.T,np.random.randn(p,n))
 """
 
 from .SQUIC_Python import set_path
-from .SQUIC_Python import check_path
 
 from .SQUIC_Python import run
 from .SQUIC_Python import S_run
