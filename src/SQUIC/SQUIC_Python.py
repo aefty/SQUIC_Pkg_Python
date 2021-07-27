@@ -3,10 +3,6 @@ import numpy as np
 from scipy.sparse import csr_matrix, identity
 from pathlib import Path
 
-# FIX OMP ERROR
-import os
-os.environ['KMP_DUPLICATE_LIB_OK']='True'
-
 dll = None
 
 def set_path(libSQUIC_path):
@@ -52,14 +48,13 @@ def get_path():
 	print("current libSQUIC path:")
 	print(dll)
 
-def run(Y, l, max_iter=100, inv_tol=1e-3, term_tol=1e-3,verbose=1, M=None, X0=None, W0=None):
+def run(Y, l, max_iter=100, tol=1e-3, verbose=1, M=None, X0=None, W0=None):
 	"""
 	Sparse Inverse Covariance Estimation
 	:param Y: Data matrix p x p consisting of p>2 random variables and n>1 samples.
 	:param l: Sparsity parameter as a nonzero positive scalar.
 	:param max_iter: [default 100] Maximum number of Newton iterations as a nonnegative integer
-	:param inv_tol: [default 1e-3] Termination tolerance as a nonzero positive scalar.
-	:param term_tol: [default 1e-3] Dropout tolerance as a nonzero positive scalar.
+	:param tol: [default 1e-3]  Tolerance as a nonzero positive scalar (both for convergence and approximate matrix inverseion).
 	:param verbose: [default 1] Verbosity level as 0 or 1.
 	:param M: [default None] Sparsity structure matrix as a sparse p x p matrix.
 	:param X0: [default None] Initial value of precision matrix as a sparse p x p matrix.
@@ -136,8 +131,9 @@ def run(Y, l, max_iter=100, inv_tol=1e-3, term_tol=1e-3,verbose=1, M=None, X0=No
 	# Parameters
 	#################################################
 	max_iter_ptr  = c_int(max_iter);
-	term_tol_ptr  = c_double(term_tol);
-	inv_tol_ptr  = c_double(inv_tol);
+	# both termination and inversion tolerance are set tol
+	term_tol_ptr  = c_double(tol); 
+	inv_tol_ptr  = c_double(tol);
 	verbose_ptr   = c_int(verbose)
 
 	p_ptr    = c_long(p)

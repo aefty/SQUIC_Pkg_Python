@@ -4,9 +4,6 @@ from scipy.linalg import cholesky
 
 import SQUIC_Python as sp
 
-# QUICK FIX OMP ERROR, remove later
-import os
-os.environ['KMP_DUPLICATE_LIB_OK']='True'
 
 def sparse_tridiag(off_diag, diag, p):
 	a = np.ones(p - 1) * off_diag
@@ -15,7 +12,6 @@ def sparse_tridiag(off_diag, diag, p):
 
 Q = sparse_tridiag(-0.5, 1.25, 10)
 print(Q)
-
 
 def tridiag(off_diag, diag, p):
 	"""
@@ -28,7 +24,6 @@ def tridiag(off_diag, diag, p):
 	a=np.ones(p-1)*off_diag
 	b=np.ones(p)*diag
 	return np.diag(a,-1) + np.diag(b,0) + np.diag(a,1)
-
 
 def sparse_generate_sample(p=1000, n=100):
 	"""
@@ -54,7 +49,7 @@ def sparse_generate_sample(p=1000, n=100):
 
 Y = sparse_generate_sample(p=10, n = 100)
 
-def generate_sample(p=1000, n=100):
+def generate_sample(p=1024, n=100):
 	"""
 	generate sample matrix Y of dimension p x n.
 	:param p: [integer] number of covariates, optional value, default p = 1000.
@@ -105,7 +100,6 @@ def run_SQUIC_S(p = 20, n = 10, verbose=True):
 	print("test succesful!")
 
 	return [S,info_times]
-
 
 def run_SQUIC(p=20,n=10, verbose=True):
 	np.set_printoptions(formatter={'float': '{: 0.3f}'.format})
