@@ -63,48 +63,33 @@ Y=np.random.randn(p,n)
 ### Example II
 
 ```angular2
-# set OMP_NUM_THREADS before loading SQUIC
-import os
-os.environ["OMP_NUM_THREADS"] = '4'
-
-# load SQUIC and numpy
 import SQUIC 
 import numpy as np
 
 # generate sample from tridiagonal precision matrix
-# number of covariates p
-p = 1024
-# number of samples n
-n = 100
+ p = 1024
+ n = 100
+ l = .4
+ max_iter = 100
+ tol = 1e-3
 
-# define tridiagonal precision matrix iC_star
+# generate a tridiagonal matrix
 a = -0.5 * np.ones(p-1)
 b = 1.25 * np.ones(p)
 iC_star = np.diag(a,-1) + np.diag(b,0) + np.diag(a,1)
 
-# compute Cholesky factorisation
+# generate the data
 L = np.linalg.cholesky(iC_star)
-
-# sample from standard normal distribution & solve
-# Y contains n samples from multivariate Gaussian distribution
-# with zero mean and precision matrix iC_star
 Y = np.linalg.solve(L.T,np.random.randn(p,n))
 
-# set regularisation parameter lambda
-l = 0.3
-# compute sample covariance matrix
-[S,info_times] = SQUIC.S_run(Y, l)
-
-# compute sparse precision matrix and its inverse
 [X,W,info_times,info_objective,info_logdetX,info_trSX] = SQUIC.run(Y,l)
 
-# X contains estimate for iC_star
-# W contains inverse of X
 ```
 
 For a detailed list of all (optional) input and output parameters: 
 
 ```angular2
+help(SQUIC)
 help(SQUIC.S_run)
 help(SQUIC.run)
 ```

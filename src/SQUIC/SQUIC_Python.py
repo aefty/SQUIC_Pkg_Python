@@ -3,10 +3,6 @@ import numpy as np
 from scipy.sparse import csr_matrix, identity
 from pathlib import Path
 
-# FIX OMP ERROR
-import os
-os.environ['KMP_DUPLICATE_LIB_OK']='True'
-
 dll = None
 
 def set_path(libSQUIC_path):
@@ -45,6 +41,7 @@ def check_path():
         else:
             print("libSQUIC path not set correctly or library not yet downloaded. Add path by calling: SQUIC.set_path(libSQUIC_path).")
             return False
+
 
 def run(Y, l, max_iter=100, tol=1e-3,verbose=1, M=None, X0=None, W0=None):
     """
@@ -230,6 +227,7 @@ def run(Y, l, max_iter=100, tol=1e-3,verbose=1, M=None, X0=None, W0=None):
     dll.SQUIC_CPP_UTIL_memfree_double(byref(info_times_ptr))
 
     return [X,W,info_times,info_objective,info_logdetX,info_trSX]
+
 
 def S_run(Y, l,verbose=1, M=None):
     """
