@@ -1,66 +1,26 @@
-## SQUIC for Python
-### Sparse Quadratic Inverse Covariance Estimation
-This is the SQUIC algorithm, made available as a Python package. 
-SQUIC tackles the statistical problem of estimating large sparse 
-inverse covariance matrices. This estimation poses an ubiquitous 
-problem that arises in many applications e.g. coming from the 
-fields mathematical finance, geology and health. 
-SQUIC belongs to the class of second-order L1-regularized 
-Gaussian maximum likelihood methods and is especially suitable 
-for high-dimensional datasets with limited number of samples. 
-For further details please see the listed references.
+# SQUIC Python Interface Package
 
-### References
+SQUIC is a second-order, L1-regularized maximum likelihood method for performant large-scale sparse precision matrix estimation. This repository contains the source code for the Python interface of SQUIC. 
 
-[1] Bollhöfer, M., Eftekhari, A., Scheidegger, S. and Schenk, O., 2019. Large-scale sparse inverse covariance matrix estimation. SIAM Journal on Scientific Computing, 41(1), pp.A380-A401.
+## Installation
 
-[2] Eftekhari, A., Bollhöfer, M. and Schenk, O., 2018, November. Distributed memory sparse inverse covariance matrix estimation on high-performance computing architectures. In SC18: International Conference for High Performance Computing, Networking, Storage and Analysis (pp. 253-264). IEEE.
+Step 1: Download the shared library libSQUIC from www.gitlab.ci.inf.usi.ch/SQUIC/libSQUIC, and follow its README instructions. The default and recommended location for libSQUIC is the home directory, i.e., ``~/``.
 
-[3] Eftekhari A, Pasadakis D, Bollhöfer M, Scheidegger S, Schenk O (2021). Block-Enhanced PrecisionMatrix Estimation for Large-Scale Datasets.Journal of Computational Science, p. 101389.
-
-### Installation
-
-We are currently supporting Linux and MacOS distributions.
-
-Before installing the SQUIC for Python package, the pre-compiled library 
-libSQUIC(.dylib/.so) needs to be installed from https://www.gitlab.ci.inf.usi.ch/SQUIC/libSQUIC. Please follow the instructions provided there.
-
-Now you can install the SQUIC for Python package from PyPI using 
-
+Step 2: Run the following command to install the library:
 ```angular2
 pip install SQUIC
 ```
-
-The libSQUIC(.dylib/.so) file is by default be installed in your home directory. 
-This way the SQUIC package for Python will find it automatically. Otherwise you can manually 
-set the path using
-
+Step 3: Load the SQUIC package:
 ```angular2
 import SQUIC
-SQUIC.set_path("/path/to/libSQUIC(.dylib/.so)")
 ```
+For further details type ``help(SQUIC)`` in the Python command line.
 
-### Example I 
+_Note: The number of threads used by SQUIC can be defined by setting the enviroment variable OMP_NUM_THREADS (e.g., ``os.environ["OMP_NUM_THREADS"] = "12"``). This will require a restart of the Python session)._
 
-```angular2
-import SQUIC 
-import numpy as np
+## Example
 
-# number of covariates p, number of samples n
-p=1024
-n=100
-
-# set regularisation parameter lambda
-l=0.4
-
-# sample synthetic data from standard normal distribution 
-Y=np.random.randn(p,n)
-
-# compute sparse precision matrix and its inverse
-[X,W,info_times,info_objective,info_logdetX,info_trSX]= SQUIC.run(Y=Y,l=l)
-```
-
-### Example II
+To run a simple example : 
 
 ```angular2
 import SQUIC 
@@ -83,13 +43,4 @@ L = np.linalg.cholesky(iC_star)
 Y = np.linalg.solve(L.T,np.random.randn(p,n))
 
 [X,W,info_times,info_objective,info_logdetX,info_trSX] = SQUIC.run(Y,l)
-
-```
-
-For a detailed list of all (optional) input and output parameters: 
-
-```angular2
-help(SQUIC)
-help(SQUIC.S_run)
-help(SQUIC.run)
 ```
