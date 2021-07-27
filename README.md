@@ -67,11 +67,11 @@ import SQUIC
 import numpy as np
 
 # generate sample from tridiagonal precision matrix
- p = 1024
- n = 100
- l = .4
- max_iter = 100
- tol = 1e-3
+p = 1024
+n = 100
+l = .4
+max_iter = 100
+tol = 1e-3
 
 # generate a tridiagonal matrix
 a = -0.5 * np.ones(p-1)
