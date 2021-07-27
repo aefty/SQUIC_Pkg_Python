@@ -69,7 +69,7 @@ import numpy as np
 # generate sample from tridiagonal precision matrix
  p = 1024
  n = 100
- lambda = .4
+ l = .4
  max_iter = 100
  tol = 1e-3
 
@@ -89,6 +89,7 @@ Y = np.linalg.solve(L.T,np.random.randn(p,n))
 For a detailed list of all (optional) input and output parameters: 
 
 ```angular2
+help(SQUIC)
 help(SQUIC.S_run)
 help(SQUIC.run)
 ```
