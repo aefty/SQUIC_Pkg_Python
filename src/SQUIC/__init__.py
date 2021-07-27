@@ -1,120 +1,87 @@
 """
-SQUIC for Python
-=========
-### Sparse Quadratic Inverse Covariance Estimation
-This is the SQUIC algorithm, made available as a Python package.
-SQUIC tackles the statistical problem of estimating large sparse
-inverse covariance matrices. This estimation poses an ubiquitous
-problem that arises in many applications e.g. coming from the
-fields mathematical finance, geology and health.
-SQUIC belongs to the class of second-order L1-regularized
-Gaussian maximum likelihood methods and is especially suitable
-for high-dimensional datasets with limited number of samples.
-For further details please see the listed references.
+SQUIC
+================
 
-### References
+description :
+SQUIC is a second-order, L1-regularized maximum likelihood method for performant large-scale sparse precision matrix estimation.
 
-[1] Eftekhari A, Pasadakis D, Bollhöfer M, Scheidegger S, Schenk O (2021). Block-Enhanced PrecisionMatrix Estimation for Large-Scale Datasets.Journal of Computational Science, p. 101389.
 
-[2] Bollhöfer, M., Eftekhari, A., Scheidegger, S. and Schenk, O., 2019. Large-scale sparse inverse covariance matrix estimation. SIAM Journal on Scientific Computing, 41(1), pp.A380-A401.
+usage :
+ SQUIC(Y, lambda, max_iter = 100, tol = 1e-3, verbose = 1, M = NULL,  X0 = NULL, W0 = NULL)
 
-[3] Eftekhari, A., Bollhöfer, M. and Schenk, O., 2018, November. Distributed memory sparse inverse covariance matrix estimation on high-performance computing architectures. In SC18: International Conference for High Performance Computing, Networking, Storage and Analysis (pp. 253-264). IEEE.
+arguments :
+    Y:          Input data in the form p (dimensions) by n (samples).
+    l:          (Non-zero positive paramater) Scalar tuning parameter controlling the sparsity of the precision matrix.
+    max_iter:   Maximum number of Newton iterations of outer loop. Default: 100.
+    tol:        Tolerance for convergence and approximate inversion. Default: 1e-3.
+    verbose:    Level of printing output (0 or 1). Default: 1.
+    M:          The matrix encoding the sparsity pattern of the matrix tuning parameter, i.e., Lambda (p by p). Default: NULL.
+    X0:         Initial guess of precision matrix (p by p). Default: NULL.
+    W0:         Initial guess of the inverse of the precision matrix (p by p). Default: NULL.
 
-### Installation
 
-We are currently supporting Linux and MacOS distributions.
+details :
+SQUIC is a high-performance precision matrix estimation package intended for large-scale applications. The algorithm utilizes second-order information in conjunction with a highly optimized, supernodal Cholesky factorization routine (CHOLMOD), a block-oriented computational approach for both the coordinate descent and the approximate matrix inversion, and finally, a sparse representation of the sample covariance matrix. The library is implemented in C++ with shared-memory parallelization using OpenMP.
+For further details, please see the listed references.
 
-Before installing the SQUIC for Python package, the pre-compiled library
-libSQUIC(.dylib/.so) needs to be installed from https://www.gitlab.ci.inf.usi.ch/SQUIC/libSQUIC. Please follow the instructions provided there.
 
-Now you can install the SQUIC for Python package from PyPI using
+return values :
+ A list with components:
 
-```angular2
-pip install SQUIC
-```
+ [X,W,info_times,info_objective,info_logdetX,info_trSX]
 
-The libSQUIC(.dylib/.so) file is by default be installed in your home directory.
-This way the SQUIC package for Python will find it automatically. Otherwise you can manually
-set the path using
+ X: Estimated precision matrix (p by p).
+ W: Estimated inverse of the precision matrix (p by p).
+ info_times: List of different compute times.
+    info_time_total: Total runtime.
+    info_time_sample_cov: Runtime of the sample covariance matrix.
+    info_time_optimize: Runtime of the Newton steps.
+    info_time_factor: Runtime of the Cholesky factorization.
+    info_time_approximate_inv: Runtime of the approximate matrix inversion.
+    info_time_coordinate_upd: Runtime of the coordinate descent update.
+ info_objective: Value of the objective at each Newton iteration.
+ info_logdetX: Value of the log determinant of the precision matrix.
+ info_trSX: Value of the trace of the sample covariance matrix times the precision matrix.
 
-```angular2
-import SQUIC
-SQUIC.set_path("/path/to/libSQUIC(.dylib/.so)")
-```
 
-### Example I
+references :
+Bollhöfer, M., Eftekhari, A., Scheidegger, S. and Schenk, O., 2019. Large-scale sparse inverse covariance matrix estimation.
+SIAM Journal on Scientific Computing, 41(1), pp.A380-A401.
 
-```angular2
-import SQUIC
-import numpy as np
+Eftekhari, A., Bollhöfer, M. and Schenk, O., 2018, November. Distributed memory sparse inverse covariance matrix estimation
+on high-performance computing architectures.
+In SC18: International Conference for High Performance Computing, Networking, Storage and Analysis (pp. 253-264). IEEE.
 
-# number of covariates p, number of samples n
-p=1024
-n=100
+Eftekhari, A., Pasadakis, D., Bollhöfer, M., Scheidegger, S. and Schenk, O., 2021. Block-Enhanced Precision Matrix Estimation
+for Large-Scale Datasets. Journal of Computational Science, p. 101389.
 
-# set regularisation parameter lambda
-l=0.4
 
-# sample synthetic data from standard normal distribution
-Y=np.random.randn(p,n)
+example :
 
-# compute sparse precision matrix and its inverse
-[X,W,info_times,info_objective,info_logdetX,info_trSX]= SQUIC.run(Y=Y,l=l)
-```
-
-### Example II
-
-```angular2
-# set OMP_NUM_THREADS before loading SQUIC
-import os
-os.environ["OMP_NUM_THREADS"] = '4'
-
-# load SQUIC and numpy
 import SQUIC
 import numpy as np
 
 # generate sample from tridiagonal precision matrix
-# number of covariates p
 p = 1024
-# number of samples n
 n = 100
+l = .4
+max_iter = 100
+tol = 1e-3
 
-# define tridiagonal precision matrix iC_star
+# generate a tridiagonal matrix
 a = -0.5 * np.ones(p-1)
 b = 1.25 * np.ones(p)
 iC_star = np.diag(a,-1) + np.diag(b,0) + np.diag(a,1)
 
-# compute Cholesky factorisation
+# generate the data
 L = np.linalg.cholesky(iC_star)
-
-# sample from standard normal distribution & solve
-# Y contains n samples from multivariate Gaussian distribution
-# with zero mean and precision matrix iC_star
 Y = np.linalg.solve(L.T,np.random.randn(p,n))
 
-# set regularisation parameter lambda
-l = 0.3
-# compute sample covariance matrix
-[S,info_times] = SQUIC.S_run(Y, l)
-
-# compute sparse precision matrix and its inverse
 [X,W,info_times,info_objective,info_logdetX,info_trSX] = SQUIC.run(Y,l)
-
-# X contains estimate for iC_star
-# W contains inverse of X
-```
-
-For a detailed list of all (optional) input and output parameters:
-
-```angular2
-help(SQUIC.S_run)
-help(SQUIC.run)
-```
 
 """
 
 from .SQUIC_Python import set_path
-from .SQUIC_Python import get_path
 from .SQUIC_Python import check_path
 
 from .SQUIC_Python import run
