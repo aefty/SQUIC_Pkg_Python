@@ -16,7 +16,7 @@ import SQUIC
 ```
 For further details type ``help(SQUIC)`` in the Python command line.
 
-_Note: The number of threads used by SQUIC can be defined by setting the enviroment variable OMP_NUM_THREADS (e.g., ``os.environ["OMP_NUM_THREADS"] = "12"``). This will require a restart of the Python session)._
+_Note: The number of threads used by SQUIC can be defined by setting the enviroment variable OMP_NUM_THREADS (e.g., ``base> export OMP_NUM_THREADS=12``). This may require a restart of the session)._
 
 ## Example
 
@@ -26,12 +26,13 @@ To run a simple example :
 import SQUIC 
 import numpy as np
 
+# set location of libSQUIC (set after importing package)
+SQUIC.PATH_TO_libSQUIC('/path/to/squic/')
+
 # generate sample from tridiagonal precision matrix
-p = 1024
+p = 10
 n = 100
 l = .4
-max_iter = 100
-tol = 1e-3
 
 # generate a tridiagonal matrix
 a = -0.5 * np.ones(p-1)
