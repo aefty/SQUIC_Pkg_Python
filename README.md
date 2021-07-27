@@ -63,11 +63,6 @@ Y=np.random.randn(p,n)
 ### Example II
 
 ```angular2
-# set OMP_NUM_THREADS before loading SQUIC
-import os
-os.environ["OMP_NUM_THREADS"] = '4'
-
-# load SQUIC and numpy
 import SQUIC 
 import numpy as np
 
